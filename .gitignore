@@ -9,5 +9,3 @@ node_modules/
 .lock
 logs/
 exports/*.tar.gz
-~/.git-creds
-~/.git-credentials

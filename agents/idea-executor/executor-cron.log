@@ -298,3 +298,9 @@ Task #4 → active
 Task #4 → active
 [idea-executor] 21:02:01 task #4 → active
 [idea-executor] 21:02:01 generating implementation script from task #4...
+[idea-executor] 21:04:01 checking task list...
+[idea-executor] 21:04:01 found pending task #4
+[idea-executor] 21:04:01 task: "Refine idea generation with knowledge graph"
+Task #4 → active
+[idea-executor] 21:04:01 task #4 → active
+[idea-executor] 21:04:01 generating implementation script from task #4...
