@@ -1,0 +1,23 @@
+services:
+  yumios:
+    build: .
+    container_name: yumios
+    ports:
+      - "18080:18080"
+      - "18081:18081"
+      - "18082:18082"
+    volumes:
+      - yumios_data:/root/.openclaw/workspace
+      - yumios_models:/root/.node-llama-cpp/models
+    restart: unless-stopped
+    stop_grace_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 6g
+        reservations:
+          memory: 2g
+
+volumes:
+  yumios_data:
+  yumios_models:
