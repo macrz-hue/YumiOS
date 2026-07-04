@@ -5,8 +5,9 @@ node_modules/
 .trash/
 *.gguf
 *.log
-cron.log
-executor-cron.log
 .session-log.md
 .lock
 logs/
+exports/*.tar.gz
+~/.git-creds
+~/.git-credentials
