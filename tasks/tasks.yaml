@@ -1,0 +1,88 @@
+[
+  {
+    "id": 1,
+    "title": "Add structured task/project tracking via tasks/ directory",
+    "status": "done",
+    "priority": "high",
+    "created": "2026-07-04T19:23:13Z",
+    "updated": "2026-07-04T19:23:40Z",
+    "source": "quick-add",
+    "tags": [
+      "core",
+      "infrastructure"
+    ],
+    "notes": "",
+    "completed": "2026-07-04T19:23:40Z"
+  },
+  {
+    "id": 2,
+    "title": "Add automatic session-close journaling",
+    "status": "done",
+    "priority": "high",
+    "created": "2026-07-04T19:23:13Z",
+    "updated": "2026-07-04T19:29:20Z",
+    "source": "quick-add",
+    "tags": [
+      "memory",
+      "continuity"
+    ],
+    "notes": "",
+    "completed": "2026-07-04T19:29:20Z"
+  },
+  {
+    "id": 3,
+    "title": "Create bootstrap installer for transferability",
+    "status": "done",
+    "priority": "high",
+    "created": "2026-07-04T19:23:13Z",
+    "updated": "2026-07-04T19:29:04Z",
+    "source": "quick-add",
+    "tags": [
+      "deployment",
+      "setup"
+    ],
+    "notes": "",
+    "completed": "2026-07-04T19:29:04Z"
+  },
+  {
+    "id": 4,
+    "title": "Refine idea generation with knowledge graph",
+    "status": "active",
+    "priority": "medium",
+    "created": "2026-07-04T19:23:13Z",
+    "updated": "2026-07-04T20:38:01Z",
+    "source": "quick-add",
+    "tags": [
+      "idea-generator"
+    ],
+    "notes": ""
+  },
+  {
+    "id": 5,
+    "title": "Set up IP masking/proxy for outbound traffic",
+    "status": "pending",
+    "priority": "high",
+    "created": "2026-07-04T20:33:26Z",
+    "updated": "2026-07-04T20:33:26Z",
+    "source": "manual",
+    "tags": [
+      "security",
+      "privacy"
+    ],
+    "notes": ""
+  },
+  {
+    "id": 6,
+    "title": "Install auditd for system access logging",
+    "status": "pending",
+    "priority": "medium",
+    "created": "2026-07-04T20:33:26Z",
+    "updated": "2026-07-04T20:33:26Z",
+    "source": "manual",
+    "tags": [
+      "security",
+      "audit"
+    ],
+    "notes": ""
+  }
+]

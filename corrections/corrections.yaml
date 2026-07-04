@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2026-07-04T20:13:26Z",
+    "trigger": "Told user the URL instead of opening browser",
+    "correction": "When user asks to see UI, I must open browser myself and navigate there \u2014 never just give them the URL",
+    "applied": true
+  },
+  {
+    "id": 2,
+    "timestamp": "2026-07-04T20:33:26Z",
+    "trigger": "No firewall rules \u2014 all ports open",
+    "correction": "Applied iptables: only ports 22, 80, 443, 18082 are open. Yumehiru dashboard is the only service exposed externally.",
+    "applied": true
+  },
+  {
+    "id": 3,
+    "timestamp": "2026-07-04T20:33:26Z",
+    "trigger": "No brute force protection",
+    "correction": "Installed and enabled fail2ban for SSH brute force prevention.",
+    "applied": true
+  }
+]

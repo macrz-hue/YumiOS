@@ -1,0 +1,118 @@
+#!/bin/bash
+# Yumehiru Voice CLI — TTS dashboard
+set -euo pipefail
+
+BASE="http://127.0.0.1:18082"
+
+api() { curl -sf "$BASE$1" 2>/dev/null || echo "{}"; }
+
+tts() {
+  local text="$1"
+  [ -z "$text" ] && return
+  local clean=$(echo "$text" | sed 's/[^a-zA-Z0-9 .,!?;:()-]//g' | head -c 500)
+  espeak-ng -s 175 -p 50 "$clean" 2>/dev/null || true
+}
+
+parse_json() {
+  python3 -c "import json,sys; d=json.load(sys.stdin); $1" 2>/dev/null
+}
+
+cmd_status() {
+  local json=$(api "/api/status")
+  echo "=== Yumehiru System ==="
+  echo "$json" | parse_json "s=d.get('services',{}); print('llama-server:', s.get('llama-server','?')); print('tool-server:', s.get('tool-server','?'))"
+  echo "$json" | parse_json "print('Memory:', d.get('memory','?')); print('Disk:', d.get('disk','?')); print('Cron:', d.get('cron_jobs','?'))"
+}
+
+cmd_tasks() {
+  local json=$(api "/api/tasks")
+  echo "=== Tasks ==="
+  echo "$json" | parse_json "
+for t in d.get('tasks', []):
+    icon = {'active':'>>','pending':' O','done':'OK','blocked':'!!'}.get(t.get('status',''),' ?')
+    print(f\"{icon} #{t['id']} [{t.get('status','')}] {t['title'][:60]}\")
+if not d.get('tasks'): print('  (no tasks)')
+"
+}
+
+cmd_alerts() {
+  local json=$(api "/api/alerts")
+  echo "=== Alerts ==="
+  echo "$json" | parse_json "
+for a in d.get('alerts', []):
+    icon = {'urgent':'!!','blocked':'--','error':'!!'}.get(a.get('type',''),'  ')
+    print(f\"{icon} {a.get('message','')}\")
+if not d.get('alerts'): print('  All clear!')
+"
+}
+
+cmd_speak() {
+  local text="${*:-}"
+  if [ -z "$text" ]; then
+    local tasks=$(api "/api/tasks")
+    local active=$(echo "$tasks" | parse_json "print(len([t for t in d.get('tasks',[]) if t.get('status')=='active']))")
+    local pending=$(echo "$tasks" | parse_json "print(len([t for t in d.get('tasks',[]) if t.get('status')=='pending']))")
+    tts "Yumehiru system. $active active tasks, $pending pending tasks."
+    echo "Speaking: $active active, $pending pending"
+  else
+    echo "Speaking: $text"
+    tts "$text"
+  fi
+}
+
+cmd_watch() {
+  echo "Watching for alerts (refresh every 15s)..."
+  local last=0
+  while true; do
+    local alerts=$(api "/api/alerts")
+    local count=$(echo "$alerts" | parse_json "print(len(d.get('alerts',[])))")
+    local tasks=$(api "/api/tasks")
+    local active=$(echo "$tasks" | parse_json "print(len([t for t in d.get('tasks',[]) if t.get('status')=='active']))")
+    
+    if [ "$count" -gt "$last" ]; then
+      echo "$alerts" | parse_json "
+for a in d.get('alerts',[]):
+    print('ALERT: ' + a.get('message',''))
+" | while read line; do
+        echo "  $line"
+        tts "${line#ALERT: }"
+      done
+      last=$count
+    fi
+    printf "\r  Watching: $count alerts, $active active tasks  "
+    sleep 15
+  done
+}
+
+cmd_dashboard() {
+  echo ""
+  echo "========================================"
+  echo "  Yumehiru Voice Dashboard"
+  echo ""
+  echo "  Commands:"
+  echo "    yumehiru status      System health"
+  echo "    yumehiru tasks       List all tasks"
+  echo "    yumehiru alerts      Show alerts"
+  echo "    yumehiru speak       Speak status"
+  echo "    yumehiru speak <t>   Speak text"
+  echo "    yumehiru watch       Live monitoring"
+  echo ""
+  echo "  Web UI: http://127.0.0.1:18082"
+  echo "========================================"
+  echo ""
+  cmd_tasks
+  echo ""
+  cmd_alerts
+}
+
+CMD="${1:-dashboard}"
+shift 2>/dev/null || true
+
+case "$CMD" in
+  status) cmd_status ;;
+  tasks)  cmd_tasks ;;
+  alerts) cmd_alerts ;;
+  speak)  cmd_speak "$@" ;;
+  watch)  cmd_watch ;;
+  *)      cmd_dashboard ;;
+esac

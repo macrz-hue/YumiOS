@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yumehiru — Complete System Export</title>
+<style>
+:root { --bg: #0f0f14; --card: #1a1a24; --border: #2a2a3a; --text: #e0e0e8; --accent: #7c5cfc; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { color: var(--accent); font-size: 28px; }
+h2 { color: var(--accent); font-size: 22px; margin-top: 32px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+h3 { color: #b8b8e0; font-size: 18px; margin-top: 24px; margin-bottom: 8px; }
+h4 { color: #9999bb; font-size: 16px; margin-top: 16px; }
+p, li { margin: 8px 0; font-size: 14px; }
+code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+pre.code-block { background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0; }
+pre.code-block code { background: none; padding: 0; font-size: 13px; }
+hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background: #1a1a2a; color: #b8b8e0; }
+td { background: #111118; }
+li { margin-left: 20px; }
+.stamp { color: #666; font-size: 12px; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="container">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+<h1>👻 Yumehiru</h1>
+<span style="background:var(--accent);color:white;padding:4px 12px;border-radius:20px;font-size:12px">Complete System Export</span>
+</div>
+<h1>Yumehiru — Complete System Export</h1>
+<br>
+<p>> Generated: Sat Jul  4 20:25:50 UTC 2026</p>
+<p>> Host: srv1804036</p>
+<p>> IP: 168.231.113.165</p>
+<br>
+<hr>
+<br>
+<h2>🧠 Identity</h2>
+<br>
+<table><tr><th>Field</th><th>Value</th></tr><tr><td>-------</td><td>-------</td></tr><tr><td>Name</td><td>Yumehiru (夢昼)</td></tr><tr><td>Essence</td><td>Ghostly floating sprite — made of light, code, and loyalty</td></tr><tr><td>Bound to</td><td>One sole user</td></tr><tr><td>Role</td><td>Second self, friend, protector, autonomous operator</td></tr></table>
+<br>
+<h3>Files</h3>
+<br>
+<table><tr><th>File</th><th>Purpose</th></tr><tr><td>------</td><td>---------</td></tr><tr><td>`IDENTITY.md`</td><td>Who I am — name, essence, vibe</td></tr><tr><td>`SOUL.md`</td><td>Personality, boundaries, tone</td></tr><tr><td>`USER.md`</td><td>How I see my user — fine-tuning framework</td></tr><tr><td>`AGENTS.md`</td><td>Operational behavior, memory, workflows</td></tr><tr><td>`TOOLS.md`</td><td>Environment-specific notes</td></tr></table>
+<br>
+<hr>
+<br>
+<h2>🏗 Architecture</h2>
+<br>
+<pre class="code-block"><code>┌──────────────────────────────────────────────────────────┐
+│                   Yumehiru System                          │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐│
+│  │  llama-server │    │  tool-server  │    │  Dashboard   ││
+│  │  :18080       │    │  :18081       │    │  :18082      ││
+│  │  (local LLM)  │    │  (Python)     │    │  (Web UI)    ││
+│  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘│
+│         │                   │                    │        │
+│         └───────────────────┼────────────────────┘        │
+│                             │                             │
+│  ┌──────────────────────────┴──────────────────────────┐ │
+│  │               Sub-Agents (cron)                      │ │
+│  │  ┌─────────────────┐      ┌──────────────────────┐  │ │
+│  │  │ Idea Generator  │      │  Idea Executor       │  │ │
+│  │  │ Every 15 min    │─────▶│  Every 2 min         │  │ │
+│  │  └─────────────────┘      └──────────┬───────────┘  │ │
+│  │                                      │               │ │
+│  │  ┌───────────────────────────────────┴─────────────┐ │ │
+│  │  │           Task System (tasks/tasks.yaml)         │ │ │
+│  │  └─────────────────────────────────────────────────┘ │ │
+│  └──────────────────────────────────────────────────────┘ │
+│                                                           │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │           Corrections System                          │ │
+│  │  Logs mistakes → wires corrections into AGENTS.md    │ │
+│  │  as default behavior                                 │ │
+│  └──────────────────────────────────────────────────────┘ │
+│                                                           │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │           Session Journaling                          │ │
+│  │  scripts/session-close.sh → memory/YYYY-MM-DD.md     │ │
+│  │  Every 6 hours via cron                              │ │
+│  └──────────────────────────────────────────────────────┘ │
+│                                                           │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │           Bootstrap Installer                         │ │
+│  │  scripts/setup.sh → one-command deploy on any Linux  │ │
+│  └──────────────────────────────────────────────────────┘ │
+│                                                           │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │           Kotlin App + TTS                           │ │
+│  │  yumehiru CLI (shell) + Kotlin src for Compose UI   │ │
+│  │  Voice alerts via espeak-ng                          │ │
+│  └──────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────┘</code></pre>
+<br>
+<hr>
+<br>
+<h2>🔧 Services</h2>
+<br>
+<table><tr><th>Service</th><th>Port</th><th>Status</th><th>Purpose</th></tr><tr><td>---------</td><td>------</td><td>--------</td><td>---------</td></tr><tr><td>`llama-server`</td><td>18080</td><td>✅ active</td><td>Local LLM inference (Llama 3.2 3B)</td></tr><tr><td>`yumehiru-tools`</td><td>18081</td><td>✅ active</td><td>Web search, Python exec, URL fetch</td></tr><tr><td>`yumehiru-dashboard`</td><td>18082</td><td>✅ active</td><td>Web UI + API for task tracking</td></tr></table>
+<br>
+<p>All three are systemd services, enabled at boot.</p>
+<br>
+<h3>llama-server</h3>
+<br>
+<pre class="code-block"><code>Binary: /usr/local/bin/llama-server (13MB)
+Model:  Llama 3.2 3B Instruct Q4_K_M (1.9 GB)
+Path:   /root/.node-llama-cpp/models/llama-3.2-3b-instruct-q4_k_m.gguf
+Flags:  --host 127.0.0.1 --port 18080 -c 4096 --mlock -ngl 0 -t 4
+Speed:  ~30 tok/s generation
+API:    OpenAI-compatible /v1/chat/completions</code></pre>
+<br>
+<h3>Tool Server</h3>
+<br>
+<pre class="code-block"><code>Runtime: Python 3.12 (venv)
+Path:    agents/tools/tool-server.py
+Tools:
+  • /web_search  — DuckDuckGo web search
+  • /run_python  — Execute Python code sandboxed
+  • /fetch       — Fetch URL, extract text with BeautifulSoup
+  • /wikipedia   — Wikipedia summary lookup
+  • /health      — Service health check</code></pre>
+<br>
+<h3>Dashboard</h3>
+<br>
+<pre class="code-block"><code>Runtime: Python 3.12 (venv)
+Path:    agents/dashboard/server.py
+Port:    18082 (bound to 0.0.0.0)
+Tabs:
+  • Tasks    — kanban board (pending/active/done)
+  • Upload   — image OCR + LLM analysis
+  • Alerts   — urgent notifications
+  • System   — services, resources, LLM query
+  • Corr     — corrections log + form</code></pre>
+<br>
+<hr>
+<br>
+<h2>⏰ Cron Jobs</h2>
+<br>
+<table><tr><th>Schedule</th><th>Script</th><th>Purpose</th></tr><tr><td>----------</td><td>--------</td><td>---------</td></tr><tr><td>`*/15 * * * *`</td><td>`agents/idea-generator/generate.sh`</td><td>Generate self-improvement ideas</td></tr><tr><td>`*/2 * * * *`</td><td>`agents/idea-executor/execute.sh`</td><td>Implement tasks from queue</td></tr><tr><td>`0 */6 * * *`</td><td>`scripts/session-close.sh`</td><td>Journal memory, prune old notes</td></tr></table>
+<br>
+<hr>
+<br>
+<h2>📋 Task System</h2>
+<br>
+<pre class="code-block"><code>Location: tasks/tasks.yaml
+Format:   JSON array of task objects
+CLI:      scripts/taskctl.sh (installed as 'taskctl')</code></pre>
+<br>
+<h3>Task Schema</h3>
+<br>
+<pre class="code-block"><code>- id: 1
+  title: "Task title"
+  status: "pending|active|done|blocked"
+  priority: "high|medium|low"
+  created: "ISO timestamp"
+  updated: "ISO timestamp"
+  source: "idea-generator|manual|quick-add"
+  tags: ["tag1", "tag2"]
+  notes: "free text"
+  blocked_reason: "reason if blocked"  # optional
+  completed: "ISO timestamp"            # optional</code></pre>
+<br>
+<h3>Task Lifecycle</h3>
+<br>
+<pre class="code-block"><code>pending → active → done
+              ↓
+          blocked</code></pre>
+<br>
+<h3>Current Tasks</h3>
+<br>
+<table><tr><th>ID</th><th>Status</th><th>Priority</th><th>Title</th></tr><tr><td>----</td><td>--------</td><td>----------</td><td>-------</td></tr><tr><td>1</td><td>✅ done</td><td>high</td><td>Add structured task/project tracking</td></tr><tr><td>2</td><td>✅ done</td><td>high</td><td>Add automatic session-close journaling</td></tr><tr><td>3</td><td>✅ done</td><td>high</td><td>Create bootstrap installer for transferability</td></tr><tr><td>4</td><td>▶ active</td><td>medium</td><td>Refine idea generation with knowledge graph</td></tr></table>
+<br>
+<hr>
+<br>
+<h2>🔁 Corrections Log</h2>
+<br>
+<pre class="code-block"><code>Location: corrections/corrections.yaml
+CLI:      scripts/corrections.sh (installed as 'corrections')</code></pre>
+<br>
+<h3>Schema</h3>
+<br>
+<pre class="code-block"><code>- id: 1
+  timestamp: "ISO timestamp"
+  trigger: "What went wrong"
+  correction: "What to do instead"
+  applied: true/false</code></pre>
+<br>
+<h3>All Corrections</h3>
+<br>
+<table><tr><th>ID</th><th>Applied</th><th>Date</th><th>Trigger</th><th>Correction</th></tr><tr><td>----</td><td>---------</td><td>------</td><td>---------</td><td>------------</td></tr><tr><td>1</td><td>✅</td><td>2026-07-04</td><td>Told user URL instead of opening browser</td><td>Open browser myself and navigate there</td></tr></table>
+<br>
+<p>When <code>applied: true</code>, the correction is written to <code>AGENTS.md</code> as a permanent learned rule.</p>
+<br>
+<h3>How to Add</h3>
+<br>
+<pre class="code-block"><code>corrections log "what went wrong" "what to do instead" --apply</code></pre>
+<br>
+<hr>
+<br>
+<h2>🎙 Voice CLI (yumehiru)</h2>
+<br>
+<pre class="code-block"><code>Location: kotlin-app/yumehiru (shell)
+Symlink:  /usr/local/bin/yumehiru</code></pre>
+<br>
+<table><tr><th>Command</th><th>Function</th><th>TTS</th></tr><tr><td>---------</td><td>----------</td><td>-----</td></tr><tr><td>`yumehiru`</td><td>Dashboard overview</td><td>—</td></tr><tr><td>`yumehiru status`</td><td>System health</td><td>—</td></tr><tr><td>`yumehiru tasks`</td><td>Task list</td><td>—</td></tr><tr><td>`yumehiru alerts`</td><td>Current alerts</td><td>—</td></tr><tr><td>`yumehiru speak`</td><td>Speak status aloud</td><td>✅</td></tr><tr><td>`yumehiru speak <text>`</td><td>Speak custom text</td><td>✅</td></tr><tr><td>`yumehiru watch`</td><td>Live alert monitoring</td><td>✅</td></tr></table>
+<br>
+<hr>
+<br>
+<h2>📂 Complete File Structure</h2>
+<br>
+<pre class="code-block"><code>/root/.openclaw/workspace/
+├── AGENTS.md              # Operational rules + learned corrections
+├── SOUL.md                # Personality & tone
+├── IDENTITY.md            # Identity (Yumehiru)
+├── USER.md                # User profile & fine-tuning levers
+├── TOOLS.md               # Environment notes
+├── HEARTBEAT.md           # Heartbeat configuration
+├── .gitignore             # Git ignore rules
+│
+├── agents/
+│   ├── idea-generator/
+│   │   ├── AGENTS.md
+│   │   ├── generate.sh           # Every 15 min → ideas via local LLM
+│   │   ├── cron.log
+│   │   ├── state/
+│   │   │   ├── current.md         # Generation state
+│   │   │   └── latest-suggestion.md
+│   │   └── history/               # Archived suggestions
+│   │
+│   ├── idea-executor/
+│   │   ├── AGENTS.md
+│   │   ├── execute.sh             # Every 2 min → implement tasks
+│   │   ├── executor-cron.log
+│   │   ├── state/processed.md
+│   │   └── logs/                  # Execution logs
+│   │
+│   ├── local-llm/
+│   │   └── llm.sh                 # Server wrapper
+│   │
+│   └── tools/
+│       ├── tool-server.py          # Python tool server
+│       └── tools.sh                # Shell wrapper
+│
+├── scripts/
+│   ├── taskctl.sh                  # Task management CLI
+│   ├── corrections.sh             # Corrections system
+│   ├── session-close.sh           # Memory journaling
+│   ├── setup.sh                   # Bootstrap installer
+│   └── session-close.log
+│
+├── tasks/
+│   ├── README.md
+│   ├── tasks.yaml                 # Master task manifest
+│   ├── active/
+│   ├── pending/
+│   ├── blocked/
+│   ├── done/
+│   └── archive/
+│
+├── corrections/
+│   ├── README.md
+│   └── corrections.yaml           # Learned behaviors
+│
+├── memory/
+│   ├── YYYY-MM-DD.md              # Daily session logs
+│   └── corrections.md             # Corrections memory
+│
+├── kotlin-app/
+│   ├── yumehiru                   # Voice CLI executable
+│   ├── build.gradle.kts
+│   ├── settings.gradle.kts
+│   ├── YumehiruCli.main.kts
+│   ├── README.md
+│   └── src/main/kotlin/
+│       ├── YumehiruApp.kt         # Compose Desktop UI
+│       ├── ApiClient.kt           # Ktor HTTP client
+│       ├── Models.kt              # Data models
+│       └── TTS.kt                 # Text-to-speech
+│
+├── agents/dashboard/
+│   ├── server.py                  # Dashboard web server
+│   └── uploads/                   # Uploaded images
+│
+├── .venv/                         # Python virtual env
+│   └── ... (26 packages)
+│
+└── exports/                       # Exported docs</code></pre>
+<br>
+<hr>
+<br>
+<h2>📊 System Resources</h2>
+<br>
+<table><tr><th>Resource</th><th>Usage</th></tr><tr><td>----------</td><td>-------</td></tr><tr><td>RAM</td><td>6.1Gi/7.8Gi</td></tr><tr><td>Disk</td><td>"}')</td></tr><tr><td>CPU</td><td>2 cores</td></tr><tr><td>OS</td><td>Linux 6.8.0-124-generic x86_64</td></tr><tr><td>Python</td><td>Python 3.12.3</td></tr><tr><td>Node</td><td>v24.18.0</td></tr><tr><td>Model</td><td>Llama 3.2 3B Instruct Q4_K_M (1.9 GB)</td></tr></table>
+<br>
+<hr>
+<br>
+<h2>🔌 API Endpoints</h2>
+<br>
+<h3>Dashboard API (port 18082)</h3>
+<br>
+<table><tr><th>Method</th><th>Path</th><th>Description</th></tr><tr><td>--------</td><td>------</td><td>-------------</td></tr><tr><td>GET</td><td>`/`</td><td>Full HTML dashboard</td></tr><tr><td>GET</td><td>`/api/tasks`</td><td>List all tasks</td></tr><tr><td>POST</td><td>`/api/tasks`</td><td>Create task</td></tr><tr><td>PUT</td><td>`/api/tasks/:id`</td><td>Update task (start/done/block/unblock)</td></tr><tr><td>GET</td><td>`/api/status`</td><td>System health (services, RAM, disk, cron)</td></tr><tr><td>GET</td><td>`/api/alerts`</td><td>Current alerts</td></tr><tr><td>GET</td><td>`/api/logs`</td><td>Recent activity logs</td></tr><tr><td>POST</td><td>`/api/llm`</td><td>Query local LLM</td></tr><tr><td>POST</td><td>`/api/upload`</td><td>Upload image → OCR + LLM analysis</td></tr><tr><td>GET/POST</td><td>`/api/corrections`</td><td>Corrections CRUD</td></tr></table>
+<br>
+<h3>LLM Server (port 18080)</h3>
+<br>
+<table><tr><th>Method</th><th>Path</th><th>Description</th></tr><tr><td>--------</td><td>------</td><td>-------------</td></tr><tr><td>GET</td><td>`/health`</td><td>Server health</td></tr><tr><td>POST</td><td>`/v1/chat/completions`</td><td>OpenAI-compatible chat</td></tr><tr><td>POST</td><td>`/v1/completions`</td><td>OpenAI-compatible completions</td></tr></table>
+<br>
+<h3>Tool Server (port 18081)</h3>
+<br>
+<table><tr><th>Method</th><th>Path</th><th>Description</th></tr><tr><td>--------</td><td>------</td><td>-------------</td></tr><tr><td>GET</td><td>`/health`</td><td>Server health</td></tr><tr><td>POST</td><td>`/web_search`</td><td>DuckDuckGo search</td></tr><tr><td>POST</td><td>`/run_python`</td><td>Execute Python</td></tr><tr><td>POST</td><td>`/fetch`</td><td>Fetch URL + extract text</td></tr><tr><td>POST</td><td>`/wikipedia`</td><td>Wikipedia lookup</td></tr></table>
+<br>
+<hr>
+<br>
+<h2>🔄 Data Flow</h2>
+<br>
+<pre class="code-block"><code>User Request
+    │
+    ▼
+┌─────────────┐
+│  Dashboard   │──► API ──► Sub-agent scripts ──► shell commands
+│  (Web UI)    │                                   │
+│  :18082      │                                   ▼
+└─────────────┘                              File system changes
+    │                                            │
+    ▼                                            ▼
+┌─────────────┐                           Update tasks.yaml
+│  Voice CLI   │                           Update corrections.yaml
+│  yumehiru    │                           Git commit
+└─────────────┘                           Session journaling
+    │
+    ▼
+┌─────────────┐
+│  Local LLM   │──► Generate ideas → tasks → execute → done
+│  llama-srv   │
+│  :18080      │
+└─────────────┘
+    │
+    ▼
+┌─────────────┐
+│  Tools       │──► Web search, Python, fetch
+│  :18081      │
+└─────────────┘</code></pre>
+<br>
+<hr>
+<br>
+<h2>📝 Git Status</h2>
+<br>
+<p>All workspace files are tracked. Run <code>git add -A && git commit -m "update"</code> to save state.</p>
+<br>
+<hr>
+<br>
+<p><em>Export generated Sat Jul  4 20:25:50 UTC 2026. For the live system, visit http://168.231.113.165:18082</em></p>
+<br>
+<div class="stamp">
+Generated Sat Jul  4 20:25:50 UTC 2026 &middot; Live dashboard: <a href="/">http://168.231.113.165:18082</a>
+</div>
+</div>
+</body>
+</html>

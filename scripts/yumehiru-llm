@@ -1,0 +1,290 @@
+#!/usr/bin/env python3
+"""Yumehiru Universal LLM — DeepSeek primary, local fallback.
+Always works. No token dependency.
+
+Usage:
+  ./yumehiru-llm <prompt>
+  echo "prompt" | ./yumehiru-llm
+  ./yumehiru-llm --system "You are helpful" -- "user message"
+  ./yumehiru-llm --json '{"messages":[...]}'
+"""
+
+import json, os, sys, subprocess, urllib.request, urllib.error, socket, textwrap
+
+# ─── Config ───────────────────────────────────────────────
+DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
+LOCAL_LLM_URL = "http://127.0.0.1:18080/v1/chat/completions"
+LOCAL_MODEL = "/root/.node-llama-cpp/models/llama-3.2-3b-instruct-q4_k_m.gguf"
+TIMEOUT = 30
+
+# Try to get DeepSeek key from OpenClaw config
+DEEPSEEK_KEY = None
+try:
+    with open("/root/.openclaw/openclaw.json") as f:
+        cfg = json.load(f)
+    models = cfg.get("models", {})
+    providers = models.get("providers", {})
+    ds = providers.get("deepseek", {})
+    if isinstance(ds, dict):
+        for m in ds.get("models", []):
+            if isinstance(m, dict) and "apiKey" in m:
+                DEEPSEEK_KEY = m["apiKey"]
+                break
+except:
+    pass
+
+# Also check env
+DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY") or DEEPSEEK_KEY
+
+def log(msg):
+    print(f"[llm] {msg}", file=sys.stderr)
+
+# ─── DeepSeek caller ──────────────────────────────────────
+def try_deepseek(messages):
+    if not DEEPSEEK_KEY:
+        log("No DeepSeek API key available")
+        return None
+
+    log("Trying DeepSeek...")
+    data = json.dumps({
+        "model": "deepseek-chat",
+        "messages": messages,
+        "max_tokens": 2048,
+        "temperature": 0.7
+    }).encode()
+
+    req = urllib.request.Request(
+        DEEPSEEK_URL,
+        data=data,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {DEEPSEEK_KEY}"
+        },
+        method="POST"
+    )
+
+    try:
+        resp = urllib.request.urlopen(req, timeout=TIMEOUT)
+        result = json.loads(resp.read())
+        content = result["choices"][0]["message"]["content"]
+        log(f"DeepSeek OK ({result['usage']['total_tokens']} tokens)")
+        return content
+    except urllib.error.HTTPError as e:
+        log(f"DeepSeek HTTP {e.code}: {e.read().decode()[:200]}")
+        return None
+    except urllib.error.URLError as e:
+        log(f"DeepSeek connection failed: {e.reason}")
+        return None
+    except Exception as e:
+        log(f"DeepSeek error: {e}")
+        return None
+
+# ─── Local LLM caller ─────────────────────────────────────
+def try_local_llm_api(messages):
+    """Try the local llama-server first (fastest)"""
+    log("Trying local llama-server...")
+    try:
+        data = json.dumps({"messages": messages, "max_tokens": 2048, "temperature": 0.7}).encode()
+        req = urllib.request.Request(
+            LOCAL_LLM_URL,
+            data=data,
+            headers={"Content-Type": "application/json"}
+        )
+        resp = urllib.request.urlopen(req, timeout=TIMEOUT)
+        result = json.loads(resp.read())
+        content = result["choices"][0]["message"]["content"]
+        log("Local llama-server OK")
+        return content
+    except Exception as e:
+        log(f"Local llama-server failed: {e}")
+        return None
+
+def try_local_llm_direct(messages):
+    """Fallback: run node-llama-cpp complete directly (no server needed)"""
+    log("Trying direct node-llama-cpp inference...")
+    
+    # Build instruct prompt
+    prompt = "<|begin_of_text|>"
+    for msg in messages:
+        role = msg.get("role", "user")
+        content = msg.get("content", "")
+        if role in ("assistant", "system", "user"):
+            prompt += f"<|start_header_id|>{role}<|end_header_id|>\n\n{content}<|eot_id|>"
+    prompt += "<|start_header_id|>assistant<|end_header_id|>"
+    
+    # Write to temp file
+    tmp = f"/tmp/yumehiru-prompt-{os.getpid()}.txt"
+    with open(tmp, "w") as f:
+        f.write(prompt)
+    
+    try:
+        nlc = "/root/.openclaw/npm/projects/openclaw-llama-cpp-provider-15b2d859e6/node_modules/@openclaw/llama-cpp-provider/node_modules/node-llama-cpp/dist/cli/cli.js"
+        if not os.path.exists(nlc):
+            log("node-llama-cpp not found")
+            return None
+        
+        result = subprocess.run(
+            ["node", nlc, "complete", LOCAL_MODEL, "--textFile", tmp, "--maxTokens", "512", "--temperature", "0.7", "--noMmap", "--meter"],
+            capture_output=True, text=True, timeout=120,
+            cwd=os.path.dirname(os.path.dirname(nlc)),
+            env={**os.environ, "NODE_PATH": os.path.join(os.path.dirname(os.path.dirname(nlc)), "node_modules")}
+        )
+        
+        # Strip ANSI codes and progress bars
+        import re
+        output = re.sub(r'\x1b\[[0-9;]*[a-zA-Z]', '', result.stdout)
+        # Extract completion (text after the prompt)
+        completion = output.replace(prompt, "").strip()
+        if not completion:
+            # Try to find "Completion:" marker
+            m = re.search(r'Completion:\s*(.*?)(?:\n|$)', output, re.DOTALL)
+            if m:
+                completion = m.group(1).strip()
+        
+        if completion:
+            log("Direct node-llama-cpp OK")
+            return completion
+        else:
+            log("Empty response from node-llama-cpp")
+            return None
+    except subprocess.TimeoutExpired:
+        log("Direct inference timed out (120s)")
+        return None
+    except Exception as e:
+        log(f"Direct inference error: {e}")
+        return None
+    finally:
+        try:
+            os.remove(tmp)
+        except:
+            pass
+
+def try_local_llm_python(messages):
+    """Last resort: run Python with transformers/ctransformers to load model"""
+    log("Last resort: Python direct model load...")
+    
+    # Build prompt
+    prompt = "<|begin_of_text|>"
+    for msg in messages:
+        role = msg.get("role", "user")
+        content = msg.get("content", "")
+        prompt += f"<|start_header_id|>{role}<|end_header_id|>\n\n{content}<|eot_id|>"
+    prompt += "<|start_header_id|>assistant<|end_header_id|>"
+    
+    script = textwrap.dedent(f"""
+    import sys, json
+    
+    # Try llama-cpp-python if available
+    try:
+        from llama_cpp import Llama
+        llm = Llama(
+            model_path="{LOCAL_MODEL}",
+            n_ctx=4096,
+            n_threads=4,
+            verbose=False
+        )
+        output = llm(
+            {json.dumps(prompt)},
+            max_tokens=512,
+            temperature=0.7,
+            stop=["<|eot_id|>", "<|start_header_id|>"]
+        )
+        print(output["choices"][0]["text"].strip())
+        sys.exit(0)
+    except ImportError:
+        pass
+    
+    # Try ctransformers
+    try:
+        from ctransformers import AutoModelForCausalLM
+        llm = AutoModelForCausalLM.from_pretrained(
+            "{LOCAL_MODEL}",
+            model_type="llama",
+            gpu_layers=0
+        )
+        output = llm({json.dumps(prompt)}, max_new_tokens=512)
+        print(output.strip())
+        sys.exit(0)
+    except ImportError:
+        pass
+    
+    print("NO_LLM_BACKEND_AVAILABLE")
+    sys.exit(1)
+    """)
+    
+    try:
+        result = subprocess.run(
+            [sys.executable, "-c", script],
+            capture_output=True, text=True, timeout=180
+        )
+        output = result.stdout.strip()
+        if output and "NO_LLM_BACKEND" not in output:
+            log("Python direct load OK")
+            return output
+        
+        # Try with venv python
+        venv_python = "/root/.openclaw/workspace/.venv/bin/python3"
+        if os.path.exists(venv_python):
+            result = subprocess.run(
+                [venv_python, "-c", script],
+                capture_output=True, text=True, timeout=180
+            )
+            output = result.stdout.strip()
+            if output and "NO_LLM_BACKEND" not in output:
+                log("Python venv direct load OK")
+                return output
+        
+        log("No Python LLM backend available (llama-cpp-python or ctransformers)")
+        return None
+    except Exception as e:
+        log(f"Python direct load error: {e}")
+        return None
+
+# ─── Main ─────────────────────────────────────────────────
+def main():
+    # Parse input
+    if len(sys.argv) > 1 and sys.argv[1] == "--json":
+        messages = json.loads(sys.argv[2]) if len(sys.argv) > 2 else json.loads(sys.stdin.read())
+    elif len(sys.argv) > 1:
+        # Check for --system flag
+        system_msg = None
+        args = sys.argv[1:]
+        if "--system" in args:
+            idx = args.index("--system")
+            system_msg = args[idx + 1]
+            args = args[:idx] + args[idx + 2:]
+        user_prompt = " ".join(args) if args else sys.stdin.read().strip()
+        messages = []
+        if system_msg:
+            messages.append({"role": "system", "content": system_msg})
+        messages.append({"role": "user", "content": user_prompt})
+    else:
+        user_prompt = sys.stdin.read().strip()
+        messages = [{"role": "user", "content": user_prompt}]
+    
+    if not messages or not messages[-1].get("content", "").strip():
+        print("Usage: yumehiru-llm <prompt>")
+        print("       echo 'prompt' | yumehiru-llm")
+        print("       yumehiru-llm --system 'sys' -- 'user'")
+        print("       yumehiru-llm --json '{\"messages\":[...]}'")
+        sys.exit(1)
+    
+    # Try strategies in order
+    strategies = [
+        ("DeepSeek API", try_deepseek),
+        ("Local llama-server", try_local_llm_api),
+        ("Direct node-llama-cpp", try_local_llm_direct),
+        ("Python direct load", try_local_llm_python),
+    ]
+    
+    for name, func in strategies:
+        result = func(messages)
+        if result:
+            print(result)
+            return
+    
+    print("❌ All LLM backends failed. No way to generate a response.", file=sys.stderr)
+    sys.exit(1)
+
+if __name__ == "__main__":
+    main()
